@@ -35,7 +35,7 @@ build.gradle
 
 ```groovy
     dependencies {
-        compile 'com.github.OkraScheduler:OkraSync:x.y.z'
+        compile 'com.github.greenmilellc-org:OkraSync:x.y.z'
     }
 ```
 
@@ -43,7 +43,7 @@ build.gradle
 
 ```xml
     <dependency>
-        <groupId>com.github.OkraScheduler</groupId>
+        <groupId>com.github.greenmilellc-org</groupId>
         <artifactId>OkraSync</artifactId>
         <version>x.y.z</version>
     </dependency>
