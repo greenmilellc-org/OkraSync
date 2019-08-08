@@ -31,34 +31,36 @@ import java.time.LocalDateTime;
 
 public final class QueryUtil {
 
+    private static final String STATUS = "status";
+
     private QueryUtil() {
     }
 
     public static Document generateRunDateQueryPart() {
         final Document query = new Document();
-        query.put("status", OkraStatus.PENDING.name());
+        query.put(STATUS, OkraStatus.PENDING.name());
         query.put("runDate", new BasicDBObject("$lt", DateUtil.toDate(LocalDateTime.now())));
         return query;
     }
 
     public static Document generateStatusProcessingAndHeartbeatExpiredQuery(final long secondsToGetExpired) {
         final Document query = new Document();
-        query.put("status", OkraStatus.PROCESSING.name());
+        query.put(STATUS, OkraStatus.PROCESSING.name());
         query.put("heartbeat", new BasicDBObject("$lt", DateUtil.nowMinusSeconds(secondsToGetExpired)));
         return query;
     }
 
     private static Document generateStatusProcessingAndHeartbeatNullQuery() {
         final Document query = new Document();
-        query.put("status", OkraStatus.PROCESSING.name());
+        query.put(STATUS, OkraStatus.PROCESSING.name());
         query.put("heartbeat", null);
         return query;
     }
 
     public static Bson generatePeekQuery(final long secondsToGetExpired) {
         return Filters.or(
-                QueryUtil.generateRunDateQueryPart(),
                 QueryUtil.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired),
-                QueryUtil.generateStatusProcessingAndHeartbeatNullQuery());
+                QueryUtil.generateStatusProcessingAndHeartbeatNullQuery()
+        );
     }
 }
