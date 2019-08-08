@@ -101,13 +101,13 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         return Optional.ofNullable(serializer.fromDocument(scheduleItemClass, document));
     }
 
-    private Document findAndUpdateDocumentByQuery(Bson peekQuery,
-                                                  Document update,
-                                                  FindOneAndUpdateOptions options) {
+    private Document findAndUpdateDocumentByQuery(final Bson bson,
+                                                  final Document update,
+                                                  final FindOneAndUpdateOptions options) {
         return client
                 .getDatabase(getDatabase())
                 .getCollection(getCollection())
-                .findOneAndUpdate(peekQuery, new Document("$set", update), options);
+                .findOneAndUpdate(bson, new Document("$set", update), options);
     }
 
     @Override
