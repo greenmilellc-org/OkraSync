@@ -89,10 +89,10 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         options.returnDocument(ReturnDocument.AFTER);
         options.sort(Sorts.ascending("runDate"));
 
-        Document document = findAndUpdateDocumentByQuery(QueryUtil.generateRunDateQueryPart(), update, options);
+        Document document = findAndUpdateDocumentByQuery(QueryUtil.pendingQuery(), update, options);
         if (document == null) {
-            final Bson peekQuery = QueryUtil.generatePeekQuery(defaultHeartbeatExpirationMillis / 1000);
-            document = findAndUpdateDocumentByQuery(peekQuery, update, options);
+            final Bson heartBeatQuery = QueryUtil.heartBeatQuery(defaultHeartbeatExpirationMillis / 1000);
+            document = findAndUpdateDocumentByQuery(heartBeatQuery, update, options);
             if(document == null){
                 return Optional.empty();
             }

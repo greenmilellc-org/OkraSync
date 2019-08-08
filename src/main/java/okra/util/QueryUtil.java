@@ -36,7 +36,7 @@ public final class QueryUtil {
     private QueryUtil() {
     }
 
-    public static Document generateRunDateQueryPart() {
+    public static Document pendingQuery() {
         final Document query = new Document();
         query.put(STATUS, OkraStatus.PENDING.name());
         query.put("runDate", new BasicDBObject("$lt", DateUtil.toDate(LocalDateTime.now())));
@@ -57,7 +57,7 @@ public final class QueryUtil {
         return query;
     }
 
-    public static Bson generatePeekQuery(final long secondsToGetExpired) {
+    public static Bson heartBeatQuery(final long secondsToGetExpired) {
         return Filters.or(
                 QueryUtil.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired),
                 QueryUtil.generateStatusProcessingAndHeartbeatNullQuery()
