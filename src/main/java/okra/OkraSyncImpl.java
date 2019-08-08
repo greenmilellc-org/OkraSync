@@ -81,7 +81,6 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
     @Override
     public Optional<T> peek() {
-        final Bson peekQuery = QueryUtil.generatePeekQuery(defaultHeartbeatExpirationMillis / 1000);
         final Document update = new Document();
         update.put("heartbeat", new Date());
         update.put("status", OkraStatus.PROCESSING.name());
@@ -90,16 +89,25 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         options.returnDocument(ReturnDocument.AFTER);
         options.sort(Sorts.ascending("runDate"));
 
-        final Document document = client
-                .getDatabase(getDatabase())
-                .getCollection(getCollection())
-                .findOneAndUpdate(peekQuery, new Document("$set", update), options);
-
+        Document document = findAndUpdateDocumentByQuery(QueryUtil.pendingQuery(), update, options);
         if (document == null) {
-            return Optional.empty();
+            final Bson heartBeatQuery = QueryUtil.heartBeatQuery(defaultHeartbeatExpirationMillis / 1000);
+            document = findAndUpdateDocumentByQuery(heartBeatQuery, update, options);
+            if(document == null){
+                return Optional.empty();
+            }
         }
 
         return Optional.ofNullable(serializer.fromDocument(scheduleItemClass, document));
+    }
+
+    private Document findAndUpdateDocumentByQuery(final Bson bson,
+                                                  final Document update,
+                                                  final FindOneAndUpdateOptions options) {
+        return client
+                .getDatabase(getDatabase())
+                .getCollection(getCollection())
+                .findOneAndUpdate(bson, new Document("$set", update), options);
     }
 
     @Override
